@@ -134,3 +134,150 @@ button[onclick="checkout()"] {
   background: white;
   cursor: pointer;
 }
+
+/* --- Feedback Form --- */
+
+.feedback-form {
+  max-width: 580px;
+}
+
+.feedback-label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.35rem;
+  margin-top: 1rem;
+  color: #444;
+}
+
+.feedback-select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: white;
+  margin-bottom: 0.2rem;
+  font-size: 1rem;
+}
+
+.feedback-form textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+}
+
+.star-rating-group {
+  margin-bottom: 0.5rem;
+}
+
+.star-rating-group label {
+  display: block;
+  font-weight: bold;
+  color: #444;
+  margin-bottom: 0.4rem;
+}
+
+.star-rating {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 0.25rem;
+}
+
+.star {
+  font-size: 2rem;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.1s ease;
+  user-select: none;
+}
+
+.star:hover,
+.star.active {
+  color: #f0a500;
+}
+
+.star:hover {
+  transform: scale(1.15);
+}
+
+.feedback-submit-btn {
+  margin-top: 1.2rem;
+  background: #2c3e50;
+  color: white;
+  border: none;
+  padding: 0.65rem 1.4rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.feedback-submit-btn:hover {
+  background: #3d5166;
+}
+
+/* --- Staff Feedback View --- */
+
+.feedback-summary-bar {
+  display: flex;
+  align-items: center;
+  background: #f9f5e8;
+  border: 1px solid #e8d9a0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.summary-avg {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.stars-inline {
+  color: #f0a500;
+  font-size: 1.1rem;
+}
+
+.feedback-card {
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.9rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.feedback-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.6rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.feedback-stars {
+  color: #f0a500;
+  font-size: 1.1rem;
+  margin-right: 0.5rem;
+}
+
+.feedback-badge {
+  background: #eaf4fb;
+  color: #2980b9;
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.feedback-card-message {
+  color: #444;
+  line-height: 1.5;
+  margin-bottom: 0.4rem;
+  white-space: pre-wrap;
+}
