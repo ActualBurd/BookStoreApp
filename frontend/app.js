@@ -51,13 +51,14 @@ async function loadBooks(query = "", type = "all") {
           src="${b.cover_url || 'https://via.placeholder.com/150x220?text=Book'}"
           alt="${b.title}"
         />
+      </div>
 
         <div class="book-info">
         <strong>${b.title}</strong><br/>
-        by ${b.authir}<br/>
+        by ${b.author_name}<br/>
         $${b.price.toFixed(2)} &mdash; ${b.stock_quantity} in stock
       </div>
-      
+
       <div>
         ${
           b.stock_quantity <= 0
