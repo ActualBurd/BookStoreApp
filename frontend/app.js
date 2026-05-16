@@ -46,10 +46,18 @@ async function loadBooks(query = "", type = "all") {
   const list = document.getElementById("book-list");
   list.innerHTML = books.map(b => `
     <div class="book-card">
-      <div>
-        <strong>${b.title}</strong> by ${b.author}<br/>
+      <div class="book-cover">
+        <img
+          src="${b.cover_url || 'https://via.placeholder.com/150x220?text=Book'}"
+          alt="${b.title}"
+        />
+
+        <div class="book-info">
+        <strong>${b.title}</strong><br/>
+        by ${b.authir}<br/>
         $${b.price.toFixed(2)} &mdash; ${b.stock_quantity} in stock
       </div>
+      
       <div>
         ${
           b.stock_quantity <= 0
