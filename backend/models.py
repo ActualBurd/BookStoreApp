@@ -16,6 +16,19 @@ class User(db.Model):
     cart = db.relationship("Cart", backref="owner", uselist=False, lazy=True)
 
 
+class LoginActivity(db.Model):
+    __tablename__ = "login_activity"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    email = db.Column(db.String(150), nullable=False)
+    role = db.Column(db.String(20), nullable=True)
+    success = db.Column(db.Boolean, nullable=False, default=True)
+    message = db.Column(db.String(255))
+    login_time = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = db.relationship("User", backref="login_activity", lazy=True)
+
 class Author(db.Model):
     __tablename__ = "authors"
     id = db.Column(db.Integer, primary_key=True)
