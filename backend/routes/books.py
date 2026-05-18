@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from models import db, Book, Author
+from models import db, Book, Author, User
 
 books_bp = Blueprint("books", __name__)
 
@@ -89,3 +89,33 @@ def _serialize(book):
         "category": book.category,
         "description": book.description,
     }
+
+@books_bp.route("/<int:book_id>/receive-stock", methods=["POST"])
+@jwt_required()
+def receive_vendor_stock(book_id):
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+
+    if not user or user.role not in ["employee", "manager"]:
+        return jsonify({"error": "Only employees or managers can receive vendor stock"}), 403
+
+    data = request.get_json()
+    quantity_received = data.get("quantity_received")
+
+    if quantity_received is None or quantity_received <= 0:
+        return jsonify({"error": "Quantity received must be greater than zero"}), 400
+
+    book = Book.query.get(book_id)
+
+    if not book:
+        return jsonify({"error": "Book not found"}), 404
+
+    book.stock_quantity += quantity_received
+    db.session.commit()
+
+    return jsonify({
+        "message": "Vendor stock received successfully",
+        "book_id": book.id,
+        "title": book.title,
+        "new_stock_quantity": book.stock_quantity
+    }), 200
