@@ -12,6 +12,7 @@ function showSection(id) {
   if (id === "feedback") initFeedbackForm();
   if (id === "staff-feedback") loadStaffFeedback();
   if (id === "reviews") loadPublicReviews();
+  if (id === "login-activity") loadLoginActivity();
 }
 
 function applyRoleUI() {
@@ -22,6 +23,7 @@ function applyRoleUI() {
   document.getElementById("nav-inventory").classList.toggle("hidden", !isEmployee);
   document.getElementById("nav-orders").classList.toggle("hidden", !isEmployee);
   document.getElementById("nav-staff-feedback").classList.toggle("hidden", !isEmployee);
+  document.getElementById("nav-login-activity").classList.toggle("hidden", userRole !== "manager");
 }
 
 function logout() {
@@ -455,6 +457,51 @@ async function saveFeedbackNote(id) {
     btn.after(indicator);
     setTimeout(() => indicator.remove(), 2000);
   }
+}
+
+// --- Manager: Login Activity ---
+
+async function loadLoginActivity() {
+  if (!token || userRole !== "manager") return;
+  const res = await fetch(`${API}/auth/login-activity`, { headers: authHeaders() });
+  if (!res.ok) return;
+  const rows = await res.json();
+
+  const statsEl = document.getElementById("login-activity-stats");
+  const listEl = document.getElementById("login-activity-list");
+
+  const total = rows.length;
+  const failed = rows.filter(r => !r.success).length;
+
+  statsEl.innerHTML = `<p style="color:#555;">${total} attempts &mdash; <span style="color:#27ae60;">${total - failed} successful</span>, <span style="color:#e74c3c;">${failed} failed</span></p>`;
+
+  if (!total) {
+    listEl.innerHTML = `<p style="color:#888;">No login activity recorded yet.</p>`;
+    return;
+  }
+
+  listEl.innerHTML = `
+    <table class="activity-table">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Email</th>
+          <th>Name</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(r => `
+          <tr>
+            <td>${escapeHtml(r.timestamp)}</td>
+            <td>${escapeHtml(r.email)}</td>
+            <td>${r.user_name ? escapeHtml(r.user_name) : "—"}</td>
+            <td><span class="activity-badge ${r.success ? "badge-success" : "badge-fail"}">${r.success ? "Success" : "Failed"}</span></td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
 }
 
 // --- Public Reviews ---
