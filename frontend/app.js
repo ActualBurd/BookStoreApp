@@ -472,24 +472,8 @@ async function loadLoginActivity() {
 
   const total = rows.length;
   const failed = rows.filter(r => !r.success).length;
-  const succeeded = total - failed;
 
-  statsEl.innerHTML = `
-    <div style="display:flex;gap:1.2rem;flex-wrap:wrap;margin-bottom:0.5rem;">
-      <div style="background:#f0f4f8;border-radius:8px;padding:0.8rem 1.4rem;text-align:center;">
-        <div style="font-size:1.5rem;font-weight:700;color:#2c3e50;">${total}</div>
-        <div style="font-size:0.85rem;color:#666;">Total Attempts</div>
-      </div>
-      <div style="background:#eafaf1;border-radius:8px;padding:0.8rem 1.4rem;text-align:center;">
-        <div style="font-size:1.5rem;font-weight:700;color:#27ae60;">${succeeded}</div>
-        <div style="font-size:0.85rem;color:#666;">Successful</div>
-      </div>
-      <div style="background:#fdedec;border-radius:8px;padding:0.8rem 1.4rem;text-align:center;">
-        <div style="font-size:1.5rem;font-weight:700;color:#e74c3c;">${failed}</div>
-        <div style="font-size:0.85rem;color:#666;">Failed</div>
-      </div>
-    </div>
-  `;
+  statsEl.innerHTML = `<p style="color:#555;">${total} attempts &mdash; <span style="color:#27ae60;">${total - failed} successful</span>, <span style="color:#e74c3c;">${failed} failed</span></p>`;
 
   if (!total) {
     listEl.innerHTML = `<p style="color:#888;">No login activity recorded yet.</p>`;
@@ -497,32 +481,24 @@ async function loadLoginActivity() {
   }
 
   listEl.innerHTML = `
-    <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+    <table class="activity-table">
       <thead>
-        <tr style="background:#2c3e50;color:white;text-align:left;">
-          <th style="padding:0.6rem 0.8rem;">Timestamp</th>
-          <th style="padding:0.6rem 0.8rem;">Email</th>
-          <th style="padding:0.6rem 0.8rem;">Name</th>
-          <th style="padding:0.6rem 0.8rem;">IP Address</th>
-          <th style="padding:0.6rem 0.8rem;">Status</th>
-          <th style="padding:0.6rem 0.8rem;">User Agent</th>
+        <tr>
+          <th>Timestamp</th>
+          <th>Email</th>
+          <th>Name</th>
+          <th>IP Address</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
-        ${rows.map((r, i) => `
-          <tr style="background:${i % 2 === 0 ? "#fff" : "#f8f9fa"};border-bottom:1px solid #e0e0e0;">
-            <td style="padding:0.55rem 0.8rem;white-space:nowrap;">${escapeHtml(r.timestamp)}</td>
-            <td style="padding:0.55rem 0.8rem;">${escapeHtml(r.email)}</td>
-            <td style="padding:0.55rem 0.8rem;">${r.user_name ? escapeHtml(r.user_name) : '<span style="color:#aaa;">—</span>'}</td>
-            <td style="padding:0.55rem 0.8rem;font-family:monospace;">${escapeHtml(r.ip_address || "—")}</td>
-            <td style="padding:0.55rem 0.8rem;">
-              <span style="
-                display:inline-block;padding:0.2rem 0.6rem;border-radius:12px;font-size:0.8rem;font-weight:600;
-                background:${r.success ? "#eafaf1" : "#fdedec"};
-                color:${r.success ? "#27ae60" : "#e74c3c"};
-              ">${r.success ? "Success" : "Failed"}</span>
-            </td>
-            <td style="padding:0.55rem 0.8rem;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#666;font-size:0.8rem;" title="${escapeHtml(r.user_agent || "")}">${escapeHtml((r.user_agent || "—").substring(0, 60))}${(r.user_agent || "").length > 60 ? "…" : ""}</td>
+        ${rows.map(r => `
+          <tr>
+            <td>${escapeHtml(r.timestamp)}</td>
+            <td>${escapeHtml(r.email)}</td>
+            <td>${r.user_name ? escapeHtml(r.user_name) : "—"}</td>
+            <td><code>${escapeHtml(r.ip_address || "—")}</code></td>
+            <td><span class="activity-badge ${r.success ? "badge-success" : "badge-fail"}">${r.success ? "Success" : "Failed"}</span></td>
           </tr>
         `).join("")}
       </tbody>

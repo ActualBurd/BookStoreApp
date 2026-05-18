@@ -584,3 +584,29 @@ button[onclick="checkout()"] {
 .btn-actioned.btn-active { background: #1e8449; color: white; }
 .btn-reset { background: #f2f3f4; color: #555; }
 .btn-save-note { background: #3498db; color: white; }
+
+.activity-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.activity-table th {
+  background: #2c3e50;
+  color: white;
+  text-align: left;
+  padding: 0.6rem 0.8rem;
+}
+.activity-table td {
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+.activity-table tr:nth-child(even) td { background: #f8f9fa; }
+.activity-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.badge-success { background: #eafaf1; color: #27ae60; }
+.badge-fail    { background: #fdedec; color: #e74c3c; }
