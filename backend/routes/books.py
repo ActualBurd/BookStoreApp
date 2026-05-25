@@ -1,8 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from models import db, Book, Author, ActivityLog
-
-books_bp = Blueprint("books", __name__)
+from models import db, Book, Author, ActivityLog, VendorOrder
+from datetime import datetime, timezone
 
 
 @books_bp.route("/", methods=["GET"])
@@ -133,4 +132,113 @@ def receive_vendor_stock(book_id):
         "title": book.title,
         "quantity_received": quantity_received,
         "new_stock_quantity": book.stock_quantity
+    }), 200
+
+
+@books_bp.route("/vendor-orders", methods=["POST"])
+@jwt_required()
+def create_vendor_order():
+    employee_check = _require_employee()
+    if employee_check:
+        return employee_check
+
+    data = request.get_json() or {}
+    book_id = data.get("book_id")
+    quantity_ordered = data.get("quantity_ordered")
+
+    if not isinstance(book_id, int):
+        return jsonify({"error": "book_id must be a number"}), 400
+
+    if not isinstance(quantity_ordered, int) or quantity_ordered <= 0:
+        return jsonify({"error": "quantity_ordered must be a positive whole number"}), 400
+
+    book = Book.query.get(book_id)
+
+    if not book:
+        return jsonify({"error": "Book not found"}), 404
+
+    vendor_order = VendorOrder(
+        book_id=book.id,
+        quantity_ordered=quantity_ordered,
+        status="Pending"
+    )
+
+    db.session.add(vendor_order)
+    db.session.commit()
+
+    return jsonify({
+        "message": "Vendor order created successfully",
+        "vendor_order_id": vendor_order.id,
+        "book_title": book.title,
+        "quantity_ordered": vendor_order.quantity_ordered,
+        "status": vendor_order.status
+    }), 201
+
+
+@books_bp.route("/vendor-orders", methods=["GET"])
+@jwt_required()
+def view_vendor_orders():
+    employee_check = _require_employee()
+    if employee_check:
+        return employee_check
+
+    vendor_orders = VendorOrder.query.all()
+    results = []
+
+    for order in vendor_orders:
+        results.append({
+            "vendor_order_id": order.id,
+            "book_id": order.book_id,
+            "book_title": order.book.title,
+            "quantity_ordered": order.quantity_ordered,
+            "quantity_received": order.quantity_received,
+            "status": order.status,
+            "created_at": order.created_at,
+            "received_at": order.received_at
+        })
+
+    return jsonify(results), 200
+
+
+@books_bp.route("/vendor-orders/<int:order_id>/receive", methods=["POST"])
+@jwt_required()
+def receive_vendor_order(order_id):
+    employee_check = _require_employee()
+    if employee_check:
+        return employee_check
+
+    data = request.get_json() or {}
+    quantity_received = data.get("quantity_received")
+
+    if not isinstance(quantity_received, int) or quantity_received <= 0:
+        return jsonify({"error": "quantity_received must be a positive whole number"}), 400
+
+    vendor_order = VendorOrder.query.get(order_id)
+
+    if not vendor_order:
+        return jsonify({"error": "Vendor order not found"}), 404
+
+    book = Book.query.get(vendor_order.book_id)
+
+    if not book:
+        return jsonify({"error": "Book not found"}), 404
+
+    vendor_order.quantity_received += quantity_received
+    book.stock_quantity += quantity_received
+
+    if vendor_order.quantity_received >= vendor_order.quantity_ordered:
+        vendor_order.status = "Received"
+        vendor_order.received_at = datetime.now(timezone.utc)
+    else:
+        vendor_order.status = "Partially Received"
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Vendor order received and inventory updated",
+        "vendor_order_id": vendor_order.id,
+        "book_title": book.title,
+        "quantity_received": quantity_received,
+        "new_stock_quantity": book.stock_quantity,
+        "vendor_order_status": vendor_order.status
     }), 200
